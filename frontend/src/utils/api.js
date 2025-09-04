@@ -22,6 +22,11 @@ api.interceptors.response.use(
   r => r,
   async error => {
     const original = error.config
+    const url = (original && original.url) || ''
+    // Do not try refresh for login/refresh endpoints
+    if (url.includes('/auth/login') || url.includes('/auth/refresh')) {
+      return Promise.reject(error)
+    }
     if (error.response && error.response.status === 401 && !original._retry) {
       original._retry = true
       try {

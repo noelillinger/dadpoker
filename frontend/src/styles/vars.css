@@ -13,14 +13,20 @@ html, body, #root { height: 100%; }
 body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
 
 .container { padding: 24px; max-width: 1200px; margin: 0 auto; }
-.header { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; }
+.header { display: flex; justify-content: space-between; align-items: center; padding: 8px 0 12px; }
 .card { background: var(--card-bg); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
 .centered { min-height: 100%; display: flex; align-items: center; justify-content: center; padding: 24px; }
 .error { color: #ff453a; margin-bottom: 8px; }
 
 label { display: block; margin: 12px 0 6px; color: var(--muted); }
 input { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #2a2a2f; background: #0e0e12; color: var(--text); }
-button { margin-top: 16px; width: 100%; padding: 12px 14px; border: none; border-radius: 10px; background: var(--accent); color: white; font-weight: 600; cursor: pointer; }
+button { margin-top: 16px; width: 100%; padding: 12px 14px; border: none; border-radius: 12px; background: var(--accent); color: white; font-weight: 600; cursor: pointer; transition: transform .08s ease, filter .2s ease, box-shadow .2s ease; }
+button:hover { filter: brightness(1.05); box-shadow: 0 6px 18px rgba(10,132,255,.25); }
+button:active { transform: translateY(1px) scale(0.995); filter: brightness(0.98); }
 button:disabled { opacity: 0.6; cursor: default; }
+
+/* Apple spinner */
+.spinner { width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.15); border-top-color: rgba(255,255,255,0.9); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
 

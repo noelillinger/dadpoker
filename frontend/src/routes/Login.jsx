@@ -11,6 +11,7 @@ export default function Login() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
   const toast = useToast()
 
   useEffect(() => {
@@ -21,6 +22,7 @@ export default function Login() {
     e.preventDefault()
     setError('')
     try {
+      setLoading(true)
       await login({ username, password })
       await fetchMe()
       // if must_change_password, route to change-password
@@ -36,7 +38,7 @@ export default function Login() {
       const msg = err?.response?.data?.detail || 'Invalid credentials'
       setError(msg)
       toast.push(msg, 'error')
-    }
+    } finally { setLoading(false) }
   }
 
   return (
@@ -48,7 +50,7 @@ export default function Login() {
         <input value={username} onChange={e => setUsername(e.target.value)} />
         <label>Password</label>
         <input type="password" value={password} onChange={e => setPassword(e.target.value)} />
-        <button type="submit">Login</button>
+        <button type="submit" disabled={loading}>{loading ? <span className="spinner" /> : 'Login'}</button>
       </form>
     </div>
   )
