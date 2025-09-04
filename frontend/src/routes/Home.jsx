@@ -15,7 +15,12 @@ export default function Home() {
     <div className="container">
       <header className="header">
         <div>Balance: ${(me?.balance ?? 0) / 100}</div>
-        <div>User: {me?.username}</div>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <div>User: {me?.username}</div>
+          {me?.role === 'admin' && (
+            <a href="/dadpoker/admin" style={{ color: 'var(--accent)', textDecoration: 'none', fontWeight: 600 }}>Admin</a>
+          )}
+        </div>
       </header>
       <main>
         <TableView />

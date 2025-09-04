@@ -4,7 +4,7 @@ import { useAuthStore } from '../stores/auth.js'
 import '../styles/table.css'
 
 export default function TableView() {
-  const { state, connect, createTable, startHand, userAction } = useTableStore()
+  const { state, connect, createTable, startHand, userAction, connected, wsError } = useTableStore()
   const me = useAuthStore(s => s.me)
   const [players, setPlayers] = useState(4)
   const [difficulty, setDifficulty] = useState('easy')
@@ -12,7 +12,7 @@ export default function TableView() {
   const [bb, setBb] = useState(100)
   const [bet, setBet] = useState(50)
 
-  useEffect(() => { connect() }, [connect])
+  useEffect(() => { connect() }, [])
 
   const onCreate = () => createTable({ players, difficulty, small_blind: sb, big_blind: bb })
 
@@ -39,8 +39,8 @@ export default function TableView() {
           <label>BB</label>
           <input type="number" min="20" value={bb} onChange={e => setBb(parseInt(e.target.value||'100'))} />
         </div>
-        <button onClick={onCreate}>Create</button>
-        <button onClick={startHand}>Start Hand</button>
+        <button disabled={!connected} onClick={onCreate}>Create</button>
+        <button disabled={!connected} onClick={startHand}>Start Hand</button>
       </div>
 
       <div className="table-board">
@@ -63,12 +63,16 @@ export default function TableView() {
         <label>Bet Amount</label>
         <input type="number" value={bet} onChange={e => setBet(parseInt(e.target.value||'50'))} />
         <div className="table-actions">
-          <button onClick={() => userAction('fold')}>Fold</button>
-          <button onClick={() => userAction('check')}>Check</button>
-          <button onClick={() => userAction('call')}>Call</button>
-          <button onClick={() => userAction('bet', bet)}>Bet</button>
-          <button onClick={() => userAction('raise', bet)}>Raise</button>
+          <button disabled={!connected} onClick={() => userAction('fold')}>Fold</button>
+          <button disabled={!connected} onClick={() => userAction('check')}>Check</button>
+          <button disabled={!connected} onClick={() => userAction('call')}>Call</button>
+          <button disabled={!connected} onClick={() => userAction('bet', bet)}>Bet</button>
+          <button disabled={!connected} onClick={() => userAction('raise', bet)}>Raise</button>
         </div>
+      </div>
+      <div style={{ marginTop: 8, fontSize: 12, opacity: 0.8 }}>
+        WS: {connected ? 'Connected' : 'Disconnected'} {wsError ? `(error: ${wsError})` : ''}
+        {!connected && <button style={{ marginLeft: 8 }} onClick={() => connect()}>Reconnect</button>}
       </div>
     </div>
   )
