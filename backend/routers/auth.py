@@ -40,7 +40,7 @@ async def refresh_token(request: Request, response: Response, db: AsyncSession =
     if not refresh:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No refresh token")
     from jose import jwt, JWTError
-    from ..config import SECRET_KEY, JWT_ALG
+    from config import SECRET_KEY, JWT_ALG
 
     try:
         payload = jwt.decode(refresh, SECRET_KEY, algorithms=[JWT_ALG])
