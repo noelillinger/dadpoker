@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../stores/auth.js'
 import { useToast } from '../utils/toastStore.js'
+import LanguageToggle from '../components/LanguageToggle.jsx'
+import { useI18n } from '../stores/i18n.js'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -13,6 +15,7 @@ export default function Login() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const toast = useToast()
+  const t = useI18n(s => s.t)
 
   useEffect(() => {
     if (me) navigate('/')
@@ -44,14 +47,15 @@ export default function Login() {
   return (
     <div className="centered">
       <form className="card" onSubmit={onSubmit}>
-        <h1>DadPoker</h1>
+        <h1 style={{ marginTop: 0, marginBottom: 8 }}>{t('appTitle')}</h1>
         {error && <div className="error">{error}</div>}
-        <label>Username</label>
+        <label>{t('username')}</label>
         <input value={username} onChange={e => setUsername(e.target.value)} />
-        <label>Password</label>
+        <label>{t('password')}</label>
         <input type="password" value={password} onChange={e => setPassword(e.target.value)} />
-        <button type="submit" disabled={loading}>{loading ? <span className="spinner" /> : 'Login'}</button>
+        <button type="submit" disabled={loading}>{loading ? <span className="spinner" /> : t('login')}</button>
       </form>
+      <div style={{ marginTop: 16 }}><LanguageToggle /></div>
     </div>
   )
 }

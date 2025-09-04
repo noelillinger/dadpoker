@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react'
 import { useTableStore } from '../stores/table.js'
 import { useAuthStore } from '../stores/auth.js'
 import '../styles/table.css'
+import { useI18n } from '../stores/i18n.js'
 
 export default function TableView() {
   const { state, connect, createTable, startHand, userAction, connected, wsError } = useTableStore()
   const me = useAuthStore(s => s.me)
+  const t = useI18n(s => s.t)
   const [players, setPlayers] = useState(4)
   const [difficulty, setDifficulty] = useState('easy')
   const [sb, setSb] = useState(50)
@@ -20,11 +22,11 @@ export default function TableView() {
     <div className="card">
       <div className="table-controls">
         <div>
-          <label>Players</label>
+          <label>{t('players')}</label>
           <input type="number" min="2" max="6" value={players} onChange={e => setPlayers(parseInt(e.target.value||'4'))} />
         </div>
         <div>
-          <label>Difficulty</label>
+          <label>{t('difficulty')}</label>
           <select value={difficulty} onChange={e => setDifficulty(e.target.value)}>
             <option value="easy">Easy</option>
             <option value="medium">Medium</option>
@@ -32,20 +34,20 @@ export default function TableView() {
           </select>
         </div>
         <div>
-          <label>SB</label>
+          <label>{t('smallBlind')}</label>
           <input type="number" min="10" value={sb} onChange={e => setSb(parseInt(e.target.value||'50'))} />
         </div>
         <div>
-          <label>BB</label>
+          <label>{t('bigBlind')}</label>
           <input type="number" min="20" value={bb} onChange={e => setBb(parseInt(e.target.value||'100'))} />
         </div>
-        <button disabled={!connected} onClick={onCreate}>Create</button>
-        <button disabled={!connected} onClick={startHand}>Start Hand</button>
+        <button disabled={!connected} onClick={onCreate}>{t('create')}</button>
+        <button disabled={!connected} onClick={startHand}>{t('startHand')}</button>
       </div>
 
       <div className="table-board">
-        <div>Pot: {(state?.pot ?? 0) / 100}</div>
-        <div>Board: {state?.board?.join(' ')}</div>
+        <div>{t('pot')}: {(state?.pot ?? 0) / 100}</div>
+        <div>{t('board')}: {state?.board?.join(' ')}</div>
       </div>
 
       <div className="table-players">
@@ -60,14 +62,14 @@ export default function TableView() {
       </div>
 
       <div style={{ marginTop: 16 }}>
-        <label>Bet Amount</label>
+        <label>{t('betAmount')}</label>
         <input type="number" value={bet} onChange={e => setBet(parseInt(e.target.value||'50'))} />
         <div className="table-actions">
-          <button disabled={!connected} onClick={() => userAction('fold')}>Fold</button>
-          <button disabled={!connected} onClick={() => userAction('check')}>Check</button>
-          <button disabled={!connected} onClick={() => userAction('call')}>Call</button>
-          <button disabled={!connected} onClick={() => userAction('bet', bet)}>Bet</button>
-          <button disabled={!connected} onClick={() => userAction('raise', bet)}>Raise</button>
+          <button disabled={!connected} onClick={() => userAction('fold')}>{t('fold')}</button>
+          <button disabled={!connected} onClick={() => userAction('check')}>{t('check')}</button>
+          <button disabled={!connected} onClick={() => userAction('call')}>{t('call')}</button>
+          <button disabled={!connected} onClick={() => userAction('bet', bet)}>{t('bet')}</button>
+          <button disabled={!connected} onClick={() => userAction('raise', bet)}>{t('raise')}</button>
         </div>
       </div>
       <div style={{ marginTop: 8, fontSize: 12, opacity: 0.8 }}>

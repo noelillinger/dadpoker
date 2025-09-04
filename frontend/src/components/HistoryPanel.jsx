@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import api from '../utils/api.js'
+import { useI18n } from '../stores/i18n.js'
 
 export default function HistoryPanel() {
+  const t = useI18n(s => s.t)
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(false)
 
@@ -18,8 +20,8 @@ export default function HistoryPanel() {
   return (
     <div className="card">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h3 style={{ margin: 0 }}>Recent Hands</h3>
-        <button onClick={load} style={{ width: 120 }}>Refresh</button>
+        <h3 style={{ margin: 0 }}>{t('recentHands')}</h3>
+        <button onClick={load} style={{ width: 120 }}>{t('refresh')}</button>
       </div>
       {loading && <div>Loading...</div>}
       <div style={{ marginTop: 8 }}>
