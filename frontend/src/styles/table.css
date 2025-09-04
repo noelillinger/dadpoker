@@ -1,0 +1,5 @@
+.table-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.table-board { margin-top: 16px; }
+.table-players { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 16px; }
+.table-actions { display: flex; gap: 8px; margin-top: 8px; }
+
