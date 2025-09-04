@@ -9,11 +9,7 @@ from database import AsyncSessionLocal
 from models import User
 
 
-ALLOWLIST = {
-    ("POST", "/api/v1/auth/login"),
-    ("POST", "/api/v1/auth/refresh"),
-    ("POST", "/api/v1/auth/logout"),
-}
+# This middleware is no longer used globally; keep helper for future IP allowlists if needed.
 
 
 async def _extract_token(request: Request) -> Optional[str]:

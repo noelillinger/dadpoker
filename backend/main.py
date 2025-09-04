@@ -32,8 +32,6 @@ app.add_middleware(
 
 app.state.limiter = limiter
 app.add_middleware(SlowAPIMiddleware)
-from middleware import admin_only_middleware
-app.middleware("http")(admin_only_middleware)
 
 
 @app.on_event("startup")
