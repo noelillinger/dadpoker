@@ -11,6 +11,7 @@ export const useTableStore = create((set, get) => ({
   ws: null,
   connected: false,
   state: null,
+  wsError: null,
   async connect() {
     let url = `${wsBase()}/ws/table/${get().tableId}`
     // append token fallback if cookies blocked
@@ -19,13 +20,26 @@ export const useTableStore = create((set, get) => ({
       if (access) url += `?token=${encodeURIComponent(access)}`
     } catch {}
     const ws = new WebSocket(url)
-    ws.onopen = () => set({ connected: true })
-    ws.onclose = () => set({ connected: false, ws: null })
+    ws.onopen = () => {
+      set({ connected: true, wsError: null })
+      // join as current user for name display
+      const me = useAuthStore.getState().me
+      if (me?.username) {
+        get().send({ type: 'JOIN_AS_USER', name: me.username })
+      }
+    }
+    ws.onclose = () => {
+      set({ connected: false, ws: null })
+      // simple auto-reconnect after 2s
+      setTimeout(() => {
+        if (!get().ws) get().connect()
+      }, 2000)
+    }
     ws.onmessage = (ev) => {
       const msg = JSON.parse(ev.data)
       if (msg.type === 'TABLE_STATE') set({ state: msg })
       if (msg.type === 'HAND_RESULT') set({ lastResult: msg })
-      if (msg.type === 'ERROR') console.warn('WS ERROR', msg.message)
+      if (msg.type === 'ERROR') set({ wsError: msg.message })
     }
     set({ ws })
   },
