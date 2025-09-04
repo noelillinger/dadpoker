@@ -44,8 +44,9 @@ async def table_ws(websocket: WebSocket, table_id: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[JWT_ALG])
         username = payload.get("sub")
-        if not username:
-            await websocket.close(code=4401)
+        role = payload.get("role")
+        if not username or role != 'admin':
+            await websocket.close(code=4403)
             return
     except JWTError:
         await websocket.close(code=4401)

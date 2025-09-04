@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter
 from slowapi.util import get_remote_address
@@ -20,7 +20,7 @@ from routers import game as game_router
 
 limiter = Limiter(key_func=get_remote_address, default_limits=[])
 
-app = FastAPI(title="DadPoker API", version="0.1.0")
+app = FastAPI(title="DadPoker API", version="0.1.0", docs_url=None, redoc_url=None)
 
 app.add_middleware(
     CORSMiddleware,
@@ -32,6 +32,8 @@ app.add_middleware(
 
 app.state.limiter = limiter
 app.add_middleware(SlowAPIMiddleware)
+from middleware import admin_only_middleware
+app.middleware("http")(admin_only_middleware)
 
 
 @app.on_event("startup")
@@ -57,9 +59,23 @@ async def on_startup() -> None:
             await session.commit()
 
 
+from deps import get_admin_user
+
+
 @app.get("/api/v1/health")
-async def health():
+async def health(_: User = Depends(get_admin_user)):
     return {"status": "ok"}
+
+
+@app.get("/api/v1/admin/openapi.json")
+async def openapi_json(_: User = Depends(get_admin_user)):
+    return app.openapi()
+
+
+@app.get("/api/v1/admin/docs")
+async def swagger_ui(_: User = Depends(get_admin_user)):
+    from fastapi.openapi.docs import get_swagger_ui_html
+    return get_swagger_ui_html(openapi_url="/api/v1/admin/openapi.json", title="DadPoker API Docs")
 
 
 # Routers
