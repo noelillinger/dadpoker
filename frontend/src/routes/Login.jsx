@@ -33,8 +33,9 @@ export default function Login() {
         navigate('/')
       }
     } catch (err) {
-      setError('Invalid credentials')
-      toast.push('Login failed', 'error')
+      const msg = err?.response?.data?.detail || 'Invalid credentials'
+      setError(msg)
+      toast.push(msg, 'error')
     }
   }
 

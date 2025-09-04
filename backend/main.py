@@ -50,7 +50,7 @@ async def on_startup() -> None:
                 role="admin",
                 password_hash=hash_password(ADMIN_PASSWORD),
                 is_active=True,
-                must_change_password=True,
+                must_change_password=False,
                 balance=1000000,  # $10,000 for admin by default
             )
             session.add(admin)
