@@ -4,8 +4,10 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './routes/App.jsx'
 import './styles/vars.css'
 import './styles/app.css'
+import { useToast } from './utils/toastStore.js'
 
 function Bootstrap() {
+  const toasts = useToast(s => s.items)
   useEffect(() => {
     try {
       const p = sessionStorage.getItem('redirectPath')
@@ -21,6 +23,11 @@ function Bootstrap() {
   return (
     <BrowserRouter basename="/dadpoker">
       <App />
+      <div className="toast-wrap">
+        {toasts.map(t => (
+          <div key={t.id} className={`toast ${t.kind}`}>{t.message}</div>
+        ))}
+      </div>
     </BrowserRouter>
   )
 }

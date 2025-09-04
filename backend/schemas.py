@@ -72,3 +72,20 @@ class HistoryResponse(BaseModel):
     items: List[HandItem]
 
 
+class AuthTokens(BaseModel):
+    access: str
+    refresh: str
+
+
+class LoginResponse(BaseModel):
+    access: str
+    refresh: str
+    me: MeOut
+
+
+class RefreshResponse(BaseModel):
+    access: str
+    refresh: str
+    me: MeOut
+
+

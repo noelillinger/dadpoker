@@ -1,4 +1,10 @@
 /* additional layout hooks */
 main { padding-top: 12px; }
 
+.toast-wrap { position: fixed; top: 16px; right: 16px; display: flex; flex-direction: column; gap: 8px; z-index: 9999; }
+.toast { background: #1e1e22; color: var(--text); border: 1px solid #2a2a2f; padding: 10px 14px; border-radius: 10px; box-shadow: var(--shadow); }
+.toast.error { border-color: #ff453a; }
+.toast.success { border-color: #32d74b; }
+.toast.info { border-color: #0a84ff; }
+
 

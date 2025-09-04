@@ -6,18 +6,19 @@ export const useAuthStore = create((set, get) => ({
   loading: false,
   accessToken: null,
   async login({ username, password }) {
-    await api.post('/auth/login', { username, password })
+    const { data } = await api.post('/auth/login', { username, password })
     try {
-      const { data } = await api.post('/auth/refresh')
       if (data?.access) {
-        try { sessionStorage.setItem('accessToken', data.access) } catch (e) {}
-        set({ accessToken: data.access })
+        sessionStorage.setItem('accessToken', data.access)
+        set({ accessToken: data.access, me: data.me })
       }
+      if (data?.refresh) sessionStorage.setItem('refreshToken', data.refresh)
     } catch (_) {}
   },
   async logout() {
     await api.post('/auth/logout')
     try { sessionStorage.removeItem('accessToken') } catch(_) {}
+    try { sessionStorage.removeItem('refreshToken') } catch(_) {}
     set({ me: null, accessToken: null })
   },
   async fetchMe() {
@@ -30,8 +31,14 @@ export const useAuthStore = create((set, get) => ({
     }
   },
   async refresh() {
-    const { data } = await api.post('/auth/refresh')
+    const rt = sessionStorage.getItem('refreshToken')
+    const headers = rt ? { Authorization: `Bearer ${rt}` } : undefined
+    const { data } = await api.post('/auth/refresh', undefined, { headers })
     // data: { access, me }
+    try {
+      if (data?.access) sessionStorage.setItem('accessToken', data.access)
+      if (data?.refresh) sessionStorage.setItem('refreshToken', data.refresh)
+    } catch (_) {}
     set({ accessToken: data.access, me: data.me || get().me })
     return data.access
   },

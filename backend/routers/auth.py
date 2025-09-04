@@ -8,7 +8,7 @@ from slowapi import Limiter
 from database import get_db_session
 from models import User
 from security import verify_password, hash_password, create_access_token, create_refresh_token, set_cookie_tokens
-from schemas import LoginRequest, MeOut, ChangePasswordRequest
+from schemas import LoginRequest, MeOut, ChangePasswordRequest, LoginResponse, RefreshResponse
 from deps import get_current_user
 
 
@@ -16,7 +16,7 @@ router = APIRouter()
 limiter = Limiter(key_func=get_remote_address)
 
 
-@router.post("/auth/login", response_model=MeOut)
+@router.post("/auth/login", response_model=LoginResponse)
 @limiter.limit("10/minute")
 async def login(request: Request, payload: LoginRequest, response: Response, db: AsyncSession = Depends(get_db_session)):
     res = await db.execute(select(User).where(User.username == payload.username))
@@ -26,13 +26,17 @@ async def login(request: Request, payload: LoginRequest, response: Response, db:
     access = create_access_token(user.username, {"role": user.role})
     refresh = create_refresh_token(user.username)
     set_cookie_tokens(response, access, refresh)
-    return user
+    return {"access": access, "refresh": refresh, "me": {"id": user.id, "username": user.username, "role": user.role, "is_active": user.is_active, "must_change_password": user.must_change_password, "balance": user.balance}}
 
 
-@router.post("/auth/refresh")
+@router.post("/auth/refresh", response_model=RefreshResponse)
 @limiter.limit("10/minute")
 async def refresh_token(request: Request, response: Response, db: AsyncSession = Depends(get_db_session)):
     refresh = request.cookies.get("refresh_token")
+    if not refresh:
+        auth = request.headers.get("Authorization", "")
+        if auth.lower().startswith("bearer "):
+            refresh = auth.split(" ", 1)[1]
     if not refresh:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No refresh token")
     from jose import jwt, JWTError
@@ -54,7 +58,7 @@ async def refresh_token(request: Request, response: Response, db: AsyncSession =
     # rotate refresh token
     new_refresh = create_refresh_token(user.username)
     set_cookie_tokens(response, access, new_refresh)
-    return {"access": access, "me": {"id": user.id, "username": user.username, "role": user.role, "is_active": user.is_active, "must_change_password": user.must_change_password, "balance": user.balance}}
+    return {"access": access, "refresh": new_refresh, "me": {"id": user.id, "username": user.username, "role": user.role, "is_active": user.is_active, "must_change_password": user.must_change_password, "balance": user.balance}}
 
 
 @router.post("/auth/logout")
