@@ -2,6 +2,7 @@ import { Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom'
 import Login from './Login.jsx'
 import Home from './Home.jsx'
 import Admin from './Admin.jsx'
+import ChangePassword from './ChangePassword.jsx'
 import { useAuthStore } from '../stores/auth.js'
 
 function RequireAuth() {
@@ -17,6 +18,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/change-password" element={<ChangePassword />} />
       <Route element={<RequireAuth />}>
         <Route path="/" element={<Home />} />
         <Route path="/admin" element={<Admin />} />

@@ -7,9 +7,17 @@ export const useAuthStore = create((set, get) => ({
   accessToken: null,
   async login({ username, password }) {
     await api.post('/auth/login', { username, password })
+    try {
+      const { data } = await api.post('/auth/refresh')
+      if (data?.access) {
+        try { sessionStorage.setItem('accessToken', data.access) } catch (e) {}
+        set({ accessToken: data.access })
+      }
+    } catch (_) {}
   },
   async logout() {
     await api.post('/auth/logout')
+    try { sessionStorage.removeItem('accessToken') } catch(_) {}
     set({ me: null, accessToken: null })
   },
   async fetchMe() {

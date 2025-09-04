@@ -7,6 +7,17 @@ const api = axios.create({
 
 let refreshing = null
 
+api.interceptors.request.use((config) => {
+  try {
+    const token = sessionStorage.getItem('accessToken')
+    if (token) {
+      config.headers = config.headers || {}
+      config.headers['Authorization'] = `Bearer ${token}`
+    }
+  } catch (e) {}
+  return config
+})
+
 api.interceptors.response.use(
   r => r,
   async error => {
@@ -17,11 +28,13 @@ api.interceptors.response.use(
         if (!refreshing) {
           refreshing = api.post('/auth/refresh')
         }
-        await refreshing
+        const { data } = await refreshing
         refreshing = null
+        try { if (data?.access) sessionStorage.setItem('accessToken', data.access) } catch(e) {}
         return api(original)
       } catch (e) {
         refreshing = null
+        try { sessionStorage.removeItem('accessToken') } catch(_) {}
         window.location.href = '/dadpoker/login'
         return Promise.reject(e)
       }

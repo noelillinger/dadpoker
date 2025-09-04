@@ -21,7 +21,13 @@ export default function Login() {
     try {
       await login({ username, password })
       await fetchMe()
-      navigate('/')
+      // if must_change_password, route to change-password
+      const meNow = useAuthStore.getState().me
+      if (meNow?.must_change_password) {
+        navigate('/change-password')
+      } else {
+        navigate('/')
+      }
     } catch (err) {
       setError('Invalid credentials')
     }

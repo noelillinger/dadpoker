@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Redirecting…</title>
+    <script>
+      (function() {
+        var base = '/dadpoker';
+        var path = location.pathname;
+        var rest = path.startsWith(base) ? path.slice(base.length) : path;
+        // Preserve search/hash
+        var redirectPath = rest + location.search + location.hash;
+        try { sessionStorage.setItem('redirectPath', redirectPath); } catch(e) {}
+        location.replace(base + '/');
+      })();
+    </script>
+  </head>
+  <body>Redirecting…</body>
+</html>
+
+
