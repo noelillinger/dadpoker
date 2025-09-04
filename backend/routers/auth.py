@@ -18,7 +18,7 @@ limiter = Limiter(key_func=get_remote_address)
 
 @router.post("/auth/login", response_model=MeOut)
 @limiter.limit("10/minute")
-async def login(payload: LoginRequest, response: Response, db: AsyncSession = Depends(get_db_session)):
+async def login(request: Request, payload: LoginRequest, response: Response, db: AsyncSession = Depends(get_db_session)):
     res = await db.execute(select(User).where(User.username == payload.username))
     user = res.scalar_one_or_none()
     if not user or not user.is_active or not verify_password(payload.password, user.password_hash):
