@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import api from '../utils/api.js'
-import { useI18n } from '../stores/i18n.js'
+import { useTranslation } from '../stores/i18n.js'
 
 export default function HistoryPanel() {
-  const t = useI18n(s => s.t)
+  const { t } = useTranslation()
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(false)
 

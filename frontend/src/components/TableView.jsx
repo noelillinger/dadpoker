@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react'
 import { useTableStore } from '../stores/table.js'
 import { useAuthStore } from '../stores/auth.js'
 import '../styles/table.css'
-import { useI18n } from '../stores/i18n.js'
+import { useTranslation } from '../stores/i18n.js'
 
 export default function TableView() {
   const { state, connect, createTable, startHand, userAction, connected, wsError } = useTableStore()
   const me = useAuthStore(s => s.me)
-  const t = useI18n(s => s.t)
+  const { t } = useTranslation()
   const [players, setPlayers] = useState(4)
   const [difficulty, setDifficulty] = useState('easy')
   const [sb, setSb] = useState(50)

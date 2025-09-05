@@ -1,4 +1,14 @@
 import os
+from pathlib import Path
+try:
+    from dotenv import load_dotenv
+    # Load backend/.env when running locally
+    env_path = Path(__file__).parent / '.env'
+    if env_path.exists():
+        load_dotenv(env_path.as_posix())
+except Exception:
+    # dotenv is optional in prod; ignore if missing
+    pass
 from typing import List
 
 
