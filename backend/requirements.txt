@@ -10,5 +10,6 @@ slowapi==0.1.9
 python-multipart==0.0.9
 itsdangerous==2.2.0
 starlette==0.37.2
+greenlet>=3.0.0
 
 

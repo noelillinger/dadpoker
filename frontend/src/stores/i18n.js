@@ -6,6 +6,9 @@ const strings = {
     username: 'Username',
     password: 'Password',
     login: 'Login',
+    showPassword: 'Show password',
+    hidePassword: 'Hide password',
+    switchLanguage: 'Switch Language',
     players: 'Players',
     difficulty: 'Difficulty',
     smallBlind: 'SB',
@@ -31,6 +34,9 @@ const strings = {
     username: 'Benutzername',
     password: 'Passwort',
     login: 'Anmelden',
+    showPassword: 'Passwort anzeigen',
+    hidePassword: 'Passwort verbergen',
+    switchLanguage: 'Sprache ändern',
     players: 'Spieler',
     difficulty: 'Schwierigkeit',
     smallBlind: 'SB',
@@ -59,11 +65,18 @@ const initialLang = (() => {
 
 export const useI18n = create((set, get) => ({
   lang: initialLang,
-  t: (k) => strings[get().lang][k] || k,
   setLang: (lang) => {
     try { localStorage.setItem('lang', lang) } catch(_) {}
     set({ lang })
   },
+  getCurrentLang: () => get().lang,
 }))
+
+// Custom hook to ensure reactivity
+export const useTranslation = () => {
+  const lang = useI18n(state => state.lang)
+  const translate = (key) => strings[lang][key] || key
+  return { t: translate, lang }
+}
 
 

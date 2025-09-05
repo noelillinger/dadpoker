@@ -7,4 +7,126 @@ main { padding-top: 12px; }
 .toast.success { border-color: #32d74b; }
 .toast.info { border-color: #0a84ff; }
 
+/* Language Toggle Styles - Apple Design System */
+.language-toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  gap: 12px;
+  margin-right: 16px;
+}
+
+.language-toggle-text-container,
+.language-toggle-button-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.language-toggle-text {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.language-toggle {
+  width: 64px;
+  height: 34px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #2a2a2f, #1a1a1e);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 6px;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,.6);
+  transition: none;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  margin-top: 0; /* Override global button margin-top */
+}
+
+.language-toggle.active {
+  justify-content: flex-end;
+}
+
+.language-toggle:hover { transform: none; box-shadow: inset 0 2px 8px rgba(0,0,0,.6); }
+
+.language-toggle:focus { box-shadow: inset 0 2px 8px rgba(0,0,0,.6); }
+
+.language-toggle-slider {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  color: #000;
+  font-size: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0,0,0,.35);
+  transform: translateY(0);
+  transition: none;
+  user-select: none;
+}
+
+.language-toggle-slider:hover { transform: none; }
+
+/* Login Page Layout */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  gap: 24px;
+}
+
+.login-form-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-toggle-container {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  justify-content: end;
+  align-content: center;
+}
+
+
+/* Password field with eye toggle */
+.password-field { position: relative; }
+.password-field input { padding-right: 44px; }
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 8px;
+  bottom: 0;
+  transform: none;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: none;
+  box-shadow: none;
+  filter: none;
+}
+.password-toggle:hover { color: var(--text); box-shadow: none; transform: none; filter: none; }
+.password-toggle:active { transform: none; box-shadow: none; filter: none; }
+.password-toggle:focus { outline: none; box-shadow: none; }
+.password-toggle svg { width: 20px; height: 20px; }
 

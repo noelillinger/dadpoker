@@ -3,13 +3,13 @@ import { useAuthStore } from '../stores/auth.js'
 import TableView from '../components/TableView.jsx'
 import HistoryPanel from '../components/HistoryPanel.jsx'
 import LanguageToggle from '../components/LanguageToggle.jsx'
-import { useI18n } from '../stores/i18n.js'
+import { useTranslation } from '../stores/i18n.js'
 
 export default function Home() {
   const me = useAuthStore(s => s.me)
   const fetchMe = useAuthStore(s => s.fetchMe)
   const logout = useAuthStore(s => s.logout)
-  const t = useI18n(s => s.t)
+  const { t } = useTranslation()
 
   useEffect(() => {
     if (!me) fetchMe()
