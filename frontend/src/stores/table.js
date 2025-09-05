@@ -2,8 +2,8 @@ import { create } from 'zustand'
 import { useAuthStore } from './auth.js'
 
 function wsBase() {
-  const base = import.meta.env.VITE_API_BASE
-  return base.replace('http', 'ws')
+  const base = (import.meta.env.VITE_API_BASE || '').replace(/\/+$/, '')
+  return base.replace('http', 'ws') + '/api/v1'
 }
 
 export const useTableStore = create((set, get) => ({
@@ -14,9 +14,9 @@ export const useTableStore = create((set, get) => ({
   wsError: null,
   async connect() {
     let url = `${wsBase()}/ws/table/${get().tableId}`
-    // append token fallback if cookies blocked
+    // append token from storage if available (avoid spamming refresh)
     try {
-      const access = await useAuthStore.getState().refresh()
+      const access = sessionStorage.getItem('accessToken')
       if (access) url += `?token=${encodeURIComponent(access)}`
     } catch {}
     const ws = new WebSocket(url)
