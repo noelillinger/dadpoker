@@ -180,11 +180,14 @@ class Table:
             "street": self.street,
             "board": list(self.board),
             "pot": self.pot,
+            "currentBet": self.current_bet,
+            "dealerIndex": self.dealer_index,
             "players": [
                 {"id": p.id, "name": p.name, "stack": p.stack, "bet": p.bet, "folded": p.folded}
                 for p in self.players
             ],
             "you": {"id": you_id, "hole": self.find_player(you_id).hole if self.find_player(you_id) else []},
+            "youLegal": self.legal_actions(you_id) if you_id else {"canAct": False},
             "toAct": self.players[self.to_act_index].id if self.players else None,
         }
 

@@ -1,5 +1,74 @@
+
+.poker-layout { display: flex; flex-direction: column; gap: 16px; }
 .table-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-.table-board { margin-top: 16px; }
-.table-players { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 16px; }
-.table-actions { display: flex; gap: 8px; margin-top: 8px; }
+
+.poker-table {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  aspect-ratio: 2.2 / 1;
+  margin: 0 auto;
+  border-radius: 50%/35%;
+  background: radial-gradient(ellipse at center, #0b7a3b 0%, #0a5e2f 70%, #094b26 100%);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.35) inset, 0 12px 24px rgba(0,0,0,0.25);
+}
+
+.center-info {
+  position: absolute;
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+}
+.pot { font-size: 20px; font-weight: 700; }
+.street { font-size: 14px; opacity: 0.9; }
+.board-cards { display: flex; gap: 8px; }
+
+.seat {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 180px;
+  transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  color: #fff;
+}
+.seat.to-act { filter: drop-shadow(0 0 12px rgba(255,255,0,0.7)); }
+.seat.folded { opacity: 0.5; }
+.seat-name { font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.6); }
+.seat-meta { display: flex; gap: 8px; font-size: 12px; opacity: 0.95; }
+.seat-cards { display: flex; gap: 6px; margin-top: 2px; }
+
+.dealer-btn {
+  background: radial-gradient(circle at 30% 30%, #fff 0%, #ddd 60%, #bbb 100%);
+  color: #222; font-weight: 800; width: 24px; height: 24px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+.card-face {
+  width: 60px; height: 84px; border-radius: 8px; background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.card-face.md { width: 60px; height: 84px; }
+.card-face.lg { width: 72px; height: 100px; }
+.card-face.back {
+  background: repeating-linear-gradient(45deg, #c33 0, #c33 6px, #a11 6px, #a11 12px);
+}
+.rank { font-size: 20px; font-weight: 800; line-height: 1; }
+.suit { font-size: 18px; line-height: 1; }
+.rank.red, .suit.red { color: #c62828; }
+.rank.black, .suit.black { color: #111; }
+
+.action-bar { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; justify-content: center; }
+.wager-input input { width: 120px; font-size: 18px; padding: 8px; }
+.actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.action-btn { font-size: 18px; padding: 12px 18px; border-radius: 8px; border: none; cursor: pointer; }
+.action-btn.primary { background: #1976d2; color: #fff; }
+.action-btn.danger { background: #d32f2f; color: #fff; }
+.action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn { font-size: 14px; padding: 8px 12px; border-radius: 6px; border: none; cursor: pointer; background: var(--accent); color: #fff; }
+.ws-status { margin-top: 8px; font-size: 12px; opacity: 0.8; text-align: center; }
+
 

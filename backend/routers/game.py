@@ -30,11 +30,13 @@ async def broadcast_state(table_id: str, table: Table):
     # Send personalized TABLE_STATE to each connected socket in the room
     for ws in list(rooms.get(table_id, [])):
         try:
-            you = ws.headers.get("x-username") or ws.cookies.get("username") or None
-            # we cannot rely on headers; instead, snapshot generic and hide hole cards by default
-            # Use a neutral snapshot with no hole cards
-            snap = table.snapshot(you_id="")
-            snap["you"] = {"id": None, "hole": []}
+            # The connection's token was validated at connect time to a username
+            username = ws.scope.get("username") or ws.headers.get("x-username") or None
+            you_id = f"user:{username}" if username else ""
+            snap = table.snapshot(you_id=you_id)
+            # If unknown, ensure no hole cards are leaked
+            if not username:
+                snap["you"] = {"id": None, "hole": []}
             await ws.send_text(json.dumps({"type": "TABLE_STATE", **snap}))
         except Exception:
             pass
@@ -65,6 +67,8 @@ async def table_ws(websocket: WebSocket, table_id: str):
         return
 
     await websocket.accept()
+    # attach username for later personalized broadcasts
+    websocket.scope["username"] = username
     rooms.setdefault(table_id, []).append(websocket)
     table = tables.get(table_id)
     if not table:
