@@ -26,7 +26,20 @@ async def _extract_token(websocket: WebSocket) -> Optional[str]:
     return token
 
 
-async def broadcast(table_id: str, message: dict):
+async def broadcast_state(table_id: str, table: Table):
+    # Send personalized TABLE_STATE to each connected socket in the room
+    for ws in list(rooms.get(table_id, [])):
+        try:
+            you = ws.headers.get("x-username") or ws.cookies.get("username") or None
+            # we cannot rely on headers; instead, snapshot generic and hide hole cards by default
+            # Use a neutral snapshot with no hole cards
+            snap = table.snapshot(you_id="")
+            snap["you"] = {"id": None, "hole": []}
+            await ws.send_text(json.dumps({"type": "TABLE_STATE", **snap}))
+        except Exception:
+            pass
+
+async def broadcast_message(table_id: str, message: dict):
     data = json.dumps(message)
     for ws in list(rooms.get(table_id, [])):
         try:
@@ -72,12 +85,30 @@ async def table_ws(websocket: WebSocket, table_id: str):
 
     await websocket.send_text(json.dumps({"type": "TABLE_STATE", **table.snapshot(you_id)}))
 
+    async def maybe_advance_street(t: Table):
+        if t.all_but_one_folded():
+            return True
+        if t.everyone_matched():
+            # if river matched, go to showdown
+            if t.street == "river":
+                t.street = "showdown"
+                return True
+            # else move to next street and reset bets
+            t.next_street()
+            t.reset_bets_for_new_street()
+            t.set_first_to_act_for_new_street()
+        return False
+
     async def handle_bot_turn():
-        if table.players and table.players[table.to_act_index].is_bot:
+        # Let bots act in sequence until it's a human's turn or hand ends
+        while table.players and table.players[table.to_act_index].is_bot and table.street != "showdown":
             bot = table.players[table.to_act_index]
             decider = get_bot_decider(table.difficulty)
             action = await decider(table.snapshot(bot.id), bot)
             await apply_action(table, bot.id, action)
+            # break if street advanced to showdown
+            if table.street == "showdown":
+                break
 
     async def apply_action(t: Table, pid: str, action: dict):
         p = t.find_player(pid)
@@ -88,17 +119,26 @@ async def table_ws(websocket: WebSocket, table_id: str):
         if a == "fold":
             p.folded = True
         elif a in ("check", "call"):
-            pass
+            # bring bet up to current_bet if needed
+            to_call = max(0, t.current_bet - p.bet)
+            call_amount = min(to_call, p.stack)
+            p.stack -= call_amount
+            p.bet += call_amount
+            t.pot += call_amount
         elif a in ("bet", "raise") and amount > 0:
-            bet = min(amount, p.stack)
-            p.stack -= bet
-            p.bet += bet
-            t.pot += bet
+            # amount is the total bet this action adds on top of current contribution
+            add = min(amount, p.stack)
+            p.stack -= add
+            p.bet += add
+            t.pot += add
+            t.current_bet = max(t.current_bet, p.bet)
         t.advance_action()
-        await broadcast(table_id, {"type": "TABLE_STATE", **t.snapshot(you_id)})
-        if t.all_but_one_folded():
+        await broadcast_state(table_id, t)
+        # maybe progress streets
+        reached_showdown = await maybe_advance_street(t)
+        if t.all_but_one_folded() or reached_showdown:
             winners, board, hands = t.settle_showdown()
-            await broadcast(table_id, {"type": "HAND_RESULT", "winners": winners, "board": board, "showdownHands": hands})
+            await broadcast_message(table_id, {"type": "HAND_RESULT", "winners": winners, "board": board, "showdownHands": hands})
             # persist delta for the human user
             start = t.pre_hand_stacks.get(you_id, None)
             end = t.find_player(you_id).stack if t.find_player(you_id) else None
@@ -133,15 +173,15 @@ async def table_ws(websocket: WebSocket, table_id: str):
                 # fill bots
                 while len([p for p in table.players if p.is_bot]) < (table.max_players - 1):
                     table.add_bot(name=f"Bot {len(table.players)+1}", stack=1000)
-                await broadcast(table_id, {"type": "TABLE_STATE", **table.snapshot(you_id)})
+                await broadcast_state(table_id, table)
             elif typ == "JOIN_AS_USER":
                 name = data.get("name", username)
                 if not table.find_player(you_id):
                     table.add_user(you_id, name, stack=1000)
-                await broadcast(table_id, {"type": "TABLE_STATE", **table.snapshot(you_id)})
+                await broadcast_state(table_id, table)
             elif typ == "START_HAND":
                 table.start_hand()
-                await broadcast(table_id, {"type": "TABLE_STATE", **table.snapshot(you_id)})
+                await broadcast_state(table_id, table)
                 await handle_bot_turn()
             elif typ == "USER_ACTION":
                 await apply_action(table, you_id, data)

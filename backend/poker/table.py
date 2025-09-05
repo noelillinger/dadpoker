@@ -33,6 +33,7 @@ class Table:
     street: str = "idle"  # idle, preflop, flop, turn, river, showdown
     to_act_index: int = 0
     pre_hand_stacks: Dict[str, int] = field(default_factory=dict)
+    current_bet: int = 0  # highest bet for the current street
 
     def find_player(self, pid: str) -> Optional[Player]:
         for p in self.players:
@@ -66,6 +67,7 @@ class Table:
         sb.bet += sb_amount
         bb.bet += bb_amount
         self.pot += sb_amount + bb_amount
+        self.current_bet = max(sb.bet, bb.bet)
 
     def deal(self):
         self.deck = make_deck()
@@ -122,6 +124,31 @@ class Table:
             self.to_act_index = (self.to_act_index + 1) % n
             if not self.players[self.to_act_index].folded:
                 break
+
+    def everyone_matched(self) -> bool:
+        # all non-folded players have matched the current bet
+        active = [p for p in self.players if not p.folded]
+        if not active:
+            return True
+        target = max((p.bet for p in active), default=0)
+        self.current_bet = target
+        return all(p.bet == target for p in active)
+
+    def set_first_to_act_for_new_street(self):
+        # On postflop and later, first to act is left of dealer
+        n = len(self.players)
+        idx = (self.dealer_index + 1) % n
+        # find first non-folded
+        for _ in range(n):
+            if not self.players[idx].folded:
+                self.to_act_index = idx
+                break
+            idx = (idx + 1) % n
+
+    def reset_bets_for_new_street(self):
+        for p in self.players:
+            p.bet = 0
+        self.current_bet = 0
 
     def settle_showdown(self):
         active = [p for p in self.players if not p.folded]

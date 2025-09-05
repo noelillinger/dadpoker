@@ -61,7 +61,7 @@ from deps import get_admin_user
 
 
 @app.get("/api/v1/health")
-async def health(_: User = Depends(get_admin_user)):
+async def health():
     return {"status": "ok"}
 
 
